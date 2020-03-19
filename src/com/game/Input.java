@@ -3,6 +3,7 @@ package com.game;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+// TODO(max): is_pressed, is_released don't work in Game, actually don't know why
 public class Input implements KeyListener {
 
     private final int KBD_LEN = 256;

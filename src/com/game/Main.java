@@ -10,7 +10,7 @@ public class Main {
     {
         Display d = new Display(800, 600, "Java window!");
         Input input = new Input(d);
-        Game game = new Game();
+        Game game = new Game(d.get_frame_buffer());
 
         long last_time = System.nanoTime();
         while (true)
