@@ -7,17 +7,17 @@ public class Main {
     public Main(String[] args)
     {
         Display d = new Display(800, 600, "Java window!");
+        Input input = new Input(d);
+        Game game = new Game();
 
         long last_time = System.nanoTime();
         while (true)
         {
-            // TODO(max): get keyboard input
-            // TODO(max): update game
+            game.update_and_render(d.get_frame_buffer(), input);
 
             d.swap_buffers();
 
-
-            long current_time = System.nanoTime();
+                       long current_time = System.nanoTime();
             float elapsed_sec = (float)(current_time - last_time) / 1000000000.0f;
             // TODO(max): use some sort of sleep instead of MELTING CPU
             while (elapsed_sec < frame_time)
@@ -27,9 +27,7 @@ public class Main {
             }
             last_time = current_time;
 
-            System.out.println((elapsed_sec * 1000.0f));
-
-            // TODO(max): swap current and last keyboard input
+            input.swap_inputs();
         }
     }
 

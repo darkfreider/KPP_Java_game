@@ -28,10 +28,6 @@ public class Display extends Canvas {
          m_display_image = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
          m_display_components = ((DataBufferByte)m_display_image.getRaster().getDataBuffer()).getData();
 
-         // REMOVE(max): this is just for a test
-         m_frame_buffer.clear((byte)0x50);
-         m_frame_buffer.set_pixel(50, 50, (byte)0, (byte)0, (byte)0xff, (byte)0);
-
          m_frame = new JFrame(title);
          m_frame.add(this);
          m_frame.pack();
@@ -50,6 +46,11 @@ public class Display extends Canvas {
         m_frame_buffer.copy_to_byte_array(m_display_components);
         m_graphics.drawImage(m_display_image, 0, 0, m_frame_buffer.width, m_frame_buffer.height, null);
         m_buffer_strategy.show();
+    }
+
+    public Bitmap get_frame_buffer()
+    {
+        return (m_frame_buffer);
     }
 
 }
