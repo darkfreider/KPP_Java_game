@@ -1,5 +1,7 @@
 package com.game;
 
+import java.awt.event.KeyEvent;
+
 public class Main {
 
     private final float frame_time = 1.0f / 30.0f;
@@ -14,6 +16,11 @@ public class Main {
         while (true)
         {
             game.update_and_render(d.get_frame_buffer(), input);
+
+            if (input.is_pressed(KeyEvent.VK_A))
+            {
+                System.out.println("PRESSED A");
+            }
 
             d.swap_buffers();
 

@@ -58,6 +58,7 @@ public class Input implements KeyListener {
     public void keyReleased(KeyEvent e)
     {
         current_kbd[e.getKeyCode()] = false;
+        System.out.println("released");
     }
 
 }
