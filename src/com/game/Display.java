@@ -28,6 +28,7 @@ public class Display extends Canvas {
          m_display_image = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
          m_display_components = ((DataBufferByte)m_display_image.getRaster().getDataBuffer()).getData();
 
+         // REMOVE(max): this is just for a test
          m_frame_buffer.clear((byte)0x50);
          m_frame_buffer.set_pixel(50, 50, (byte)0, (byte)0, (byte)0xff, (byte)0);
 
