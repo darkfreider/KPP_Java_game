@@ -13,24 +13,27 @@ public class Main {
         Game game = new Game(d.get_frame_buffer());
 
         long last_time = System.nanoTime();
-        while (true)
-        {
+        while (true) {
             game.update_and_render(d.get_frame_buffer(), input);
 
-            if (input.is_pressed(KeyEvent.VK_A))
-            {
+            if (input.is_pressed(KeyEvent.VK_A)) {
                 System.out.println("PRESSED A");
             }
 
             d.swap_buffers();
 
-                       long current_time = System.nanoTime();
-            float elapsed_sec = (float)(current_time - last_time) / 1000000000.0f;
+            long current_time = System.nanoTime();
+            float elapsed_sec = (float) (current_time - last_time) / 1000000000.0f;
             // TODO(max): use some sort of sleep instead of MELTING CPU
-            while (elapsed_sec < frame_time)
+            if (elapsed_sec < frame_time) {
+                while (elapsed_sec < frame_time) {
+                    current_time = System.nanoTime();
+                    elapsed_sec = (float) (current_time - last_time) / 1000000000.0f;
+                }
+            }
+            else
             {
-                current_time = System.nanoTime();
-                elapsed_sec = (float)(current_time - last_time) / 1000000000.0f;
+                System.out.println("MISSED A FRAME");
             }
             last_time = current_time;
 
