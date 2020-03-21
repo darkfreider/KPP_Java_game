@@ -8,9 +8,11 @@ public class Main {
 
     public Main(String[] args)
     {
-        Display d = new Display(800, 600, "Java window!");
+        int dwidth = 800;
+        int dheight = 600;
+        Display d = new Display(dwidth, dheight, "Java window!");
         Input input = new Input(d);
-        Game game = new StarField(d.get_frame_buffer(), 1000);
+        Game game = new StarField(d.get_frame_buffer(), 3000);
 
         long last_time = System.nanoTime();
         while (true) {

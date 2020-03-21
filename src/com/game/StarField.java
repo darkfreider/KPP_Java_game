@@ -5,7 +5,7 @@ import java.util.Random;
 public class StarField extends Game
 {
     private Random m_r = new Random();
-    float speed = 1.0f;
+    float speed = 1.4f;
     float[] position_x;
     float[] position_y;
     float[] position_z;
@@ -20,7 +20,7 @@ public class StarField extends Game
         {
             position_x[i] = -1.0f + 2.0f * m_r.nextFloat();
             position_y[i] = -1.0f + 2.0f * m_r.nextFloat();
-            position_z[i] = -3.0f + 2.0f * (-1.0f + 2.0f * m_r.nextFloat());
+            position_z[i] = -4.0f + 2.0f * (-1.0f + 2.0f * m_r.nextFloat());
         }
     }
 
@@ -34,7 +34,7 @@ public class StarField extends Game
             {
                 position_x[i] = -1.0f + 2.0f * m_r.nextFloat();
                 position_y[i] = -1.0f + 2.0f * m_r.nextFloat();
-                position_z[i] = -3.0f + 2.0f * (-1.0f + 2.0f * m_r.nextFloat());
+                position_z[i] = -4.0f + 2.0f * (-1.0f + 2.0f * m_r.nextFloat());
             }
         }
 
