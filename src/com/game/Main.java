@@ -10,11 +10,11 @@ public class Main {
     {
         Display d = new Display(800, 600, "Java window!");
         Input input = new Input(d);
-        Game game = new Game(d.get_frame_buffer());
+        Game game = new GameOfLife(d.get_frame_buffer());
 
         long last_time = System.nanoTime();
         while (true) {
-            game.update_and_render(d.get_frame_buffer(), input);
+            game.update_and_render(d.get_frame_buffer(), input, frame_time);
 
             if (input.is_pressed(KeyEvent.VK_A)) {
                 System.out.println("PRESSED A");
@@ -33,6 +33,7 @@ public class Main {
             }
             else
             {
+                // TODO(max): add thread governing
                 System.out.println("MISSED A FRAME");
             }
             last_time = current_time;
