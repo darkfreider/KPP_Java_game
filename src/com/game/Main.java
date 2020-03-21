@@ -10,7 +10,7 @@ public class Main {
     {
         Display d = new Display(800, 600, "Java window!");
         Input input = new Input(d);
-        Game game = new GameOfLife(d.get_frame_buffer());
+        Game game = new StarField(d.get_frame_buffer(), 1000);
 
         long last_time = System.nanoTime();
         while (true) {

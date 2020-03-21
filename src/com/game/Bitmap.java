@@ -22,6 +22,9 @@ public class Bitmap {
 
     public void set_pixel(int x, int y, byte a, byte r, byte g, byte b)
     {
+        if ((x < 0 || x >= width) || (y < 0 || y >= height))
+            return;
+
         int i = (y * width + x) * 4;
         m_components[i] = a;
         m_components[i + 1] = b;
