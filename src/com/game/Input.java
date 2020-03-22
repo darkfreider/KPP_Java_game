@@ -3,63 +3,76 @@ package com.game;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-// TODO(max): is_pressed, is_released don't work in Game, actually don't know why
+// NOTE(max): for now I'll stick with this input class
+// all the credits go to this article -> https://www.gamedev.net/articles/programming/general-and-gameplay-programming/java-games-keyboard-and-mouse-r2439/
+// turns out that the problem was tha MY code that handled keyboard input (those callbacks) were running in as different thread
+// so yeah, SYNCHRONIZATION is quite important
+
 public class Input implements KeyListener {
 
-    private final int KBD_LEN = 256;
-    private boolean[] current_kbd = new boolean[KBD_LEN];
-    private boolean[] prev_kbd = new boolean[KBD_LEN];
+    private static final int KEY_COUNT = 256;
 
-    public Input(Display d)
-    {
-        d.addKeyListener(this);
+    private enum KeyState {
+        RELEASED, // Not down
+        PRESSED,  // Down, but not the first time
+        ONCE      // Down for the first time
     }
 
-    public void swap_inputs()
-    {
-        for (int i = 0; i < KBD_LEN; i++)
-        {
-            prev_kbd[i] = current_kbd[i];
+    // Current state of the keyboard
+    private boolean[] currentKeys = null;
+
+    // Polled keyboard state
+    private KeyState[] keys = null;
+
+    public Input() {
+        currentKeys = new boolean[ KEY_COUNT ];
+        keys = new KeyState[ KEY_COUNT ];
+        for( int i = 0; i < KEY_COUNT; ++i ) {
+            keys[ i ] = KeyState.RELEASED;
         }
     }
 
-    public boolean is_pressed(int key)
-    {
-        return current_kbd[key] && !prev_kbd[key];
+    public synchronized void poll() {
+        for( int i = 0; i < KEY_COUNT; ++i ) {
+            // Set the key state
+            if( currentKeys[ i ] ) {
+                // If the key is down now, but was not
+                // down last frame, set it to ONCE,
+                // otherwise, set it to PRESSED
+                if( keys[ i ] == KeyState.RELEASED )
+                    keys[ i ] = KeyState.ONCE;
+                else
+                    keys[ i ] = KeyState.PRESSED;
+            } else {
+                keys[ i ] = KeyState.RELEASED;
+            }
+        }
     }
 
-    public boolean is_released(int key)
-    {
-        return !current_kbd[key] && prev_kbd[key];
+    public boolean keyDown( int keyCode ) {
+        return keys[ keyCode ] == KeyState.ONCE ||
+                keys[ keyCode ] == KeyState.PRESSED;
     }
 
-    public boolean is_down(int key)
-    {
-        return current_kbd[key];
+    public boolean keyDownOnce( int keyCode ) {
+        return keys[ keyCode ] == KeyState.ONCE;
     }
 
-    public boolean is_up(int key)
-    {
-        return prev_kbd[key];
+    public synchronized void keyPressed( KeyEvent e ) {
+        int keyCode = e.getKeyCode();
+        if( keyCode >= 0 && keyCode < KEY_COUNT ) {
+            currentKeys[ keyCode ] = true;
+        }
     }
 
-    @Override
-    public void keyTyped(KeyEvent e)
-    {
-        // NOTE(max): As I understand now, this callback is used for text input that I don't need right now
+    public synchronized void keyReleased( KeyEvent e ) {
+        int keyCode = e.getKeyCode();
+        if( keyCode >= 0 && keyCode < KEY_COUNT ) {
+            currentKeys[ keyCode ] = false;
+        }
     }
 
-    @Override
-    public void keyPressed(KeyEvent e)
-    {
-        current_kbd[e.getKeyCode()] = true;
+    public void keyTyped( KeyEvent e ) {
+        // Not needed
     }
-
-    @Override
-    public void keyReleased(KeyEvent e)
-    {
-        current_kbd[e.getKeyCode()] = false;
-        System.out.println("released");
-    }
-
 }
