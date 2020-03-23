@@ -1,4 +1,6 @@
-package com.game;
+package com.game.PlatformServices;
+
+import com.game.Bitmap;
 
 import javax.swing.*;
 import java.awt.*;

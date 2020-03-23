@@ -1,4 +1,8 @@
-package com.game;
+package com.game.Demos;
+
+import com.game.Bitmap;
+import com.game.Game;
+import com.game.PlatformServices.Input;
 
 public class RayCastingDemo extends Game
 {

@@ -20,6 +20,17 @@ public class Bitmap {
         Arrays.fill(m_components, shade);
     }
 
+    public void clear(byte a, byte r, byte g, byte b)
+    {
+        for (int i = 0; i < m_components.length; i += 4)
+        {
+            m_components[i] = a;
+            m_components[i + 1] = b;
+            m_components[i + 2] = g;
+            m_components[i + 3] = r;
+        }
+    }
+
     public void set_pixel(int x, int y, byte a, byte r, byte g, byte b)
     {
         if ((x < 0 || x >= width) || (y < 0 || y >= height))

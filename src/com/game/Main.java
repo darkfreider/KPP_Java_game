@@ -1,6 +1,8 @@
 package com.game;
 
-import java.awt.event.KeyEvent;
+import com.game.Sokoban.Sokoban;
+import com.game.PlatformServices.Display;
+import com.game.PlatformServices.Input;
 
 public class Main {
 
@@ -39,8 +41,6 @@ public class Main {
             last_time = current_time;
 
             d.swap_buffers();
-
-            //input.swap_inputs();
         }
     }
 

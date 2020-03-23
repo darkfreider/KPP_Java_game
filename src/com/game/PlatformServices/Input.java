@@ -1,4 +1,4 @@
-package com.game;
+package com.game.PlatformServices;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -49,12 +49,12 @@ public class Input implements KeyListener {
         }
     }
 
-    public boolean keyDown( int keyCode ) {
+    public boolean key_down( int keyCode ) {
         return keys[ keyCode ] == KeyState.ONCE ||
                 keys[ keyCode ] == KeyState.PRESSED;
     }
 
-    public boolean keyDownOnce( int keyCode ) {
+    public boolean key_down_once( int keyCode ) {
         return keys[ keyCode ] == KeyState.ONCE;
     }
 

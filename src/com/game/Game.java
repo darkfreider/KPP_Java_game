@@ -1,8 +1,7 @@
 package com.game;
 
-import java.awt.event.KeyEvent;
-import java.security.Key;
-import java.util.Random;
+import com.game.Bitmap;
+import com.game.PlatformServices.Input;
 
 public abstract class Game
 {
