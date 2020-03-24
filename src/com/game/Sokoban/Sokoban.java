@@ -21,8 +21,7 @@ public class Sokoban extends Game
 
     private int m_map_width;
     private int m_map_height;
-    // NOTE(max): I think we don's need this array right now
-    private int[] m_map;
+    private int[] m_static_map;
 
     Stack<GameEvent> event_stack = new Stack<GameEvent>();
     Vector<Box> boxes = new Vector<Box>();
@@ -33,10 +32,30 @@ public class Sokoban extends Game
         m_tile_width = m_tile_height = 32;
         m_map_width = buf.width / 32;
         m_map_height = buf.height / 32;
-        m_map = new int[m_map_width * m_map_height];
+        m_static_map = new int[m_map_width * m_map_height];
 
         boxes.add(new Box(event_stack, 5, 5));
-        boxes.add(new Box(event_stack, 7, 9));
+        boxes.add(new Box(event_stack, 12, 9));
+        boxes.add(new Box(event_stack, 15, 16));
+
+        for (int y = 0; y < m_map_height; y++)
+        {
+            for (int x = 0; x < m_map_width; x++)
+            {
+                if ((x == 0 || x == m_map_width - 1) || (y == 0 || y == m_map_height - 1))
+                {
+                    m_static_map[y * m_map_width + x] = 1;
+                }
+            }
+        }
+        m_static_map[8 * m_map_width + 6] = 1;
+        m_static_map[8 * m_map_width + 7] = 1;
+        m_static_map[8 * m_map_width + 8] = 1;
+
+        m_static_map[9 * m_map_width + 6] = 1;
+        m_static_map[9 * m_map_width + 8] = 1;
+
+
     }
 
     @Override
@@ -45,7 +64,7 @@ public class Sokoban extends Game
         if (input.key_down_once(KeyEvent.VK_RIGHT))
         {
             event_stack.push(new GameEvent(GAME_EVENT_DELIMINATOR));
-            if (!player.move_if_can(boxes, 1, 0))
+            if (!player.move_if_can(m_static_map, m_map_width, m_map_height, boxes, 1, 0))
             {
                 event_stack.pop();
             }
@@ -53,7 +72,7 @@ public class Sokoban extends Game
         else if (input.key_down_once(KeyEvent.VK_LEFT))
         {
             event_stack.push(new GameEvent(GAME_EVENT_DELIMINATOR));
-            if (!player.move_if_can(boxes, -1, 0))
+            if (!player.move_if_can(m_static_map, m_map_width, m_map_height, boxes, -1, 0))
             {
                 event_stack.pop();
             };
@@ -61,7 +80,7 @@ public class Sokoban extends Game
         else if (input.key_down_once(KeyEvent.VK_DOWN))
         {
             event_stack.push(new GameEvent(GAME_EVENT_DELIMINATOR));
-            if (!player.move_if_can(boxes, 0, 1))
+            if (!player.move_if_can(m_static_map, m_map_width, m_map_height,  boxes, 0, 1))
             {
                 event_stack.pop();
             }
@@ -69,7 +88,7 @@ public class Sokoban extends Game
         else if (input.key_down_once(KeyEvent.VK_UP))
         {
             event_stack.push(new GameEvent(GAME_EVENT_DELIMINATOR));
-            if (!player.move_if_can(boxes, 0, -1))
+            if (!player.move_if_can(m_static_map, m_map_width, m_map_height, boxes, 0, -1))
             {
                 event_stack.pop();
             }
@@ -116,6 +135,18 @@ public class Sokoban extends Game
         }
 
         buf.clear((byte)0, (byte)0, (byte)0xff, (byte)0);
+
+        for (int y = 0; y < m_map_height; y++)
+        {
+            for (int x = 0; x < m_map_width; x++)
+            {
+                if (m_static_map[y * m_map_width + x] == 1)
+                {
+                    draw_rectangle(buf, x * m_tile_width, y * m_tile_height, m_tile_width, m_tile_height, 0, 0,0);
+                }
+            }
+        }
+
         draw_rectangle(buf, player.x * m_tile_width, player.y * m_tile_height, m_tile_width, m_tile_height, 0xff, 0, 0);
         for (Box box : boxes) {
             draw_rectangle(buf, box.x * m_tile_width, box.y * m_tile_height, m_tile_width, m_tile_height, 0xff, 0xff, 0);
