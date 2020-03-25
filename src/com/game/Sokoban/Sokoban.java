@@ -3,6 +3,7 @@ package com.game.Sokoban;
 import com.game.Bitmap;
 import com.game.Game;
 import com.game.PlatformServices.Input;
+import com.game.Vector2i;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -27,6 +28,8 @@ public class Sokoban extends Game
     Vector<Box> boxes = new Vector<Box>();
     Player player = new Player(event_stack, 10, 10);
 
+    Vector<Vector2i> points = new Vector<Vector2i>();
+
     public Sokoban(Bitmap buf)
     {
         m_tile_width = m_tile_height = 32;
@@ -37,6 +40,12 @@ public class Sokoban extends Game
         boxes.add(new Box(event_stack, 5, 5));
         boxes.add(new Box(event_stack, 12, 9));
         boxes.add(new Box(event_stack, 15, 16));
+        boxes.add(new Box(event_stack, 3, 17));
+
+        points.add(new Vector2i(1, 1));
+        points.add(new Vector2i(1, 2));
+        points.add(new Vector2i(2, 1));
+        points.add(new Vector2i(7, 9));
 
         for (int y = 0; y < m_map_height; y++)
         {
@@ -134,22 +143,48 @@ public class Sokoban extends Game
             }
         }
 
-        buf.clear((byte)0, (byte)0, (byte)0xff, (byte)0);
-
-        for (int y = 0; y < m_map_height; y++)
+        int counter = points.size();
+        for (Box box : boxes)
         {
-            for (int x = 0; x < m_map_width; x++)
+            for (Vector2i point : points)
             {
-                if (m_static_map[y * m_map_width + x] == 1)
+                if (point.x == box.x && point.y == box.y)
                 {
-                    draw_rectangle(buf, x * m_tile_width, y * m_tile_height, m_tile_width, m_tile_height, 0, 0,0);
+                    counter--;
                 }
             }
         }
 
-        draw_rectangle(buf, player.x * m_tile_width, player.y * m_tile_height, m_tile_width, m_tile_height, 0xff, 0, 0);
-        for (Box box : boxes) {
-            draw_rectangle(buf, box.x * m_tile_width, box.y * m_tile_height, m_tile_width, m_tile_height, 0xff, 0xff, 0);
+        if (counter != 0)
+        {
+            buf.clear((byte)0, (byte)0, (byte)0xff, (byte)0);
+
+            // DEBUG(max): drawing static collision map for debugging purposes
+            for (int y = 0; y < m_map_height; y++)
+            {
+                for (int x = 0; x < m_map_width; x++)
+                {
+                    if (m_static_map[y * m_map_width + x] == 1)
+                    {
+                        draw_rectangle(buf, x * m_tile_width, y * m_tile_height, m_tile_width, m_tile_height, 0, 0,0);
+                    }
+                }
+            }
+
+            for (Vector2i point : points)
+            {
+                draw_rectangle(buf, point.x * m_tile_width, point.y * m_tile_height, m_tile_width, m_tile_height, 0xff, 0xff, 0xff);
+            }
+
+            draw_rectangle(buf, player.x * m_tile_width, player.y * m_tile_height, m_tile_width, m_tile_height, 0xff, 0, 0);
+            for (Box box : boxes) {
+                draw_rectangle(buf, box.x * m_tile_width, box.y * m_tile_height, m_tile_width, m_tile_height, 0xff, 0xff, 0);
+            }
+        }
+        else
+        {
+            buf.clear((byte)0, (byte)0xff, (byte)0xff, (byte)0xff);
+
         }
     }
 
