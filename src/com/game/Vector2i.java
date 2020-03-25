@@ -24,10 +24,26 @@ public class Vector2i
         return (this);
     }
 
+    public  Vector2i add(int x, int y)
+    {
+        this.x += x;
+        this.y += y;
+
+        return (this);
+    }
+
     public Vector2i sub(Vector2i v)
     {
         x -= v.x;
         y -= v.y;
+
+        return (this);
+    }
+
+    public  Vector2i sub(int x, int y)
+    {
+        this.x -= x;
+        this.y -= y;
 
         return (this);
     }
