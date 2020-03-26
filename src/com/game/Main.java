@@ -1,6 +1,6 @@
 package com.game;
 
-import com.game.Demos.ImgGuiDemo;
+import com.game.Demos.ImmGuiDemo;
 import com.game.Sokoban.Sokoban;
 import com.game.PlatformServices.Display;
 import com.game.PlatformServices.Input;
@@ -17,7 +17,7 @@ public class Main {
         Display d = new Display(dwidth, dheight, "Java window!");
         Input input = new Input(d);
 
-        Game game = new ImgGuiDemo(d.get_frame_buffer());
+        Game game = new ImmGuiDemo(d.get_frame_buffer());
 
         long last_time = System.nanoTime();
         while (is_running) {
