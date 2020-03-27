@@ -2,6 +2,7 @@ package com.game.Demos;
 
 import com.game.Bitmap;
 import com.game.Game;
+import com.game.MutableFloat;
 import com.game.PlatformServices.Input;
 import com.game.Sokoban.GameEvent;
 import com.game.Vector2i;
@@ -53,12 +54,8 @@ public class ImmGuiDemo extends Game
         {
             ui_active_item = 0;
         }
-        else
-        {
-            if (ui_active_item == 0)
-            {
-                ui_active_item = -1;
-            }
+        else if (ui_active_item == 0) {
+            ui_active_item = 0;
         }
     }
 
@@ -71,6 +68,45 @@ public class ImmGuiDemo extends Game
         }
 
         return (true);
+    }
+
+    private boolean do_slider(Bitmap buf, int id, int x, int y, MutableFloat val)
+    {
+        if (region_on_hit(x, y, 32, 256))
+        {
+           ui_hot_item = id;
+           if (ui_active_item == 0 && ui_mouse_down)
+           {
+               ui_active_item = id;
+           }
+        }
+
+        draw_rectangle(buf, x, y, 32, 256, 0xaaaaaaaa);
+
+        if (ui_active_item == id)
+        {
+            int y_pos = ui_mouse_pos.y - y;
+            if (y_pos < 0) y_pos = 0;
+            if (y_pos > 256) y_pos = 256;
+
+
+            draw_rectangle(buf, x, y + y_pos, 32, 256 - y_pos, 0xFFFFFF00);
+
+
+            float curr_val = 1.0f - (float)y_pos / 256.0f;
+            if (curr_val != val.val)
+            {
+                val.val = curr_val;
+                return (true);
+            }
+        }
+        else
+        {
+            int height = (int)(val.val * 256.0f);
+            draw_rectangle(buf, x, y + (256 - height), 32, height, 0xFFFFFF00);
+        }
+
+        return (false);
     }
 
     private boolean do_button(Bitmap buf, int id, int x, int y)
@@ -130,7 +166,7 @@ public class ImmGuiDemo extends Game
         {
             if (do_button(buf, get_next_uiid(), reference_x, reference_y + ui_button_height + 50))
             {
-                bg_color = 0xff777777;
+                bg_color = 0x77777777;
             }
         }
 
@@ -145,10 +181,27 @@ public class ImmGuiDemo extends Game
 
         for (int i = 0; i < colors.length; i++)
         {
-            int id = get_next_uiid();
-            if (do_button(buf, id, reference_x + (i * ui_button_width) + (i * 50), reference_y))
+            if (do_button(buf, get_next_uiid(), reference_x + (i * ui_button_width) + (i * 50), reference_y))
             {
                 bg_color = colors[i];
+            }
+        }
+
+        MutableFloat[] arr = new MutableFloat[3];
+        arr[0] = new MutableFloat((float)((bg_color >> 16) & 0xff) / 255.0f);
+        arr[1] = new MutableFloat((float)((bg_color >> 8) & 0xff) / 255.0f);
+        arr[2] = new MutableFloat((float)((bg_color) & 0xff) / 255.0f);
+
+        int base_slider_x = 50;
+        int base_slider_y = 300;
+        int slider_padding = 50;
+
+        for (int i = 0; i < 3; i++)
+        {
+            if (do_slider(buf, get_next_uiid(), base_slider_x + (i * (32 + slider_padding)), base_slider_y, arr[i]))
+            {
+                int shamt = (2 - i) * 8;
+                bg_color = ( bg_color & ~(0xff << shamt) ) | ( ((int)(255.0f * arr[i].val)) << shamt );
             }
         }
 
