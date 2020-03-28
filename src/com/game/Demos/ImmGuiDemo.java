@@ -1,11 +1,8 @@
 package com.game.Demos;
 
-import com.game.Bitmap;
-import com.game.Game;
-import com.game.MutableFloat;
+import com.game.*;
 import com.game.PlatformServices.Input;
 import com.game.Sokoban.GameEvent;
-import com.game.Vector2i;
 
 import java.awt.event.KeyEvent;
 
@@ -29,6 +26,7 @@ public class ImmGuiDemo extends Game
     Vector2i dim = new Vector2i(100, 80);
 
     int bg_color = 0xff9966ff;
+    boolean check_box_state = false;
 
     public ImmGuiDemo(Bitmap buf)
     {
@@ -68,6 +66,35 @@ public class ImmGuiDemo extends Game
         }
 
         return (true);
+    }
+
+    private boolean do_check_box(Bitmap buf, int id, int x, int y, MutableBoolean checked)
+    {
+        if (region_on_hit(x, y, 16, 16))
+        {
+            ui_hot_item = id;
+            if (ui_active_item == 0 && ui_mouse_down)
+            {
+                ui_active_item = id;
+            }
+        }
+
+        draw_rectangle(buf, x, y, 8, 8, 0xaaaaaaaa);
+
+        if (ui_active_item == id && ui_hot_item == id && !ui_mouse_down)
+        {
+            // change state
+            checked.val = !checked.val;
+            draw_rectangle(buf, x, y, 16, 16, checked.val ? 0xffffffff : 0xaaaaaaaa);
+
+            return (true);
+        }
+        else
+        {
+            draw_rectangle(buf, x, y, 16, 16, checked.val ? 0xffffffff : 0xaaaaaaaa);
+        }
+
+        return (false);
     }
 
     private boolean do_slider(Bitmap buf, int id, int x, int y, MutableFloat val)
@@ -162,7 +189,8 @@ public class ImmGuiDemo extends Game
         int reference_x = 75;
         int reference_y = 50;
 
-        if (input.key_down(KeyEvent.VK_E))
+        //if (input.key_down(KeyEvent.VK_E))
+        if (check_box_state)
         {
             if (do_button(buf, get_next_uiid(), reference_x, reference_y + ui_button_height + 50))
             {
@@ -203,6 +231,12 @@ public class ImmGuiDemo extends Game
                 int shamt = (2 - i) * 8;
                 bg_color = ( bg_color & ~(0xff << shamt) ) | ( ((int)(255.0f * arr[i].val)) << shamt );
             }
+        }
+
+        MutableBoolean checked = new MutableBoolean(check_box_state);
+        if (do_check_box(buf, get_next_uiid(), 500, 500, checked))
+        {
+            check_box_state = !check_box_state;
         }
 
         immgui_finish();
