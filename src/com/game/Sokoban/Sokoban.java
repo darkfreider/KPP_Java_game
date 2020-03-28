@@ -151,6 +151,7 @@ public class Sokoban extends Game
                 if (point.x == box.x && point.y == box.y)
                 {
                     counter--;
+                    break;
                 }
             }
         }

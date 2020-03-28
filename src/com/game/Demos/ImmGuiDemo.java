@@ -68,7 +68,7 @@ public class ImmGuiDemo extends Game
         return (true);
     }
 
-    private boolean do_check_box(Bitmap buf, int id, int x, int y, MutableBoolean checked)
+    private boolean do_check_box(Bitmap buf, int id, int x, int y, boolean checked)
     {
         if (region_on_hit(x, y, 16, 16))
         {
@@ -83,15 +83,12 @@ public class ImmGuiDemo extends Game
 
         if (ui_active_item == id && ui_hot_item == id && !ui_mouse_down)
         {
-            // change state
-            checked.val = !checked.val;
-            draw_rectangle(buf, x, y, 16, 16, checked.val ? 0xffffffff : 0xaaaaaaaa);
-
+            draw_rectangle(buf, x, y, 16, 16, checked ? 0xffffffff : 0xaaaaaaaa);
             return (true);
         }
         else
         {
-            draw_rectangle(buf, x, y, 16, 16, checked.val ? 0xffffffff : 0xaaaaaaaa);
+            draw_rectangle(buf, x, y, 16, 16, checked ? 0xffffffff : 0xaaaaaaaa);
         }
 
         return (false);
@@ -233,8 +230,7 @@ public class ImmGuiDemo extends Game
             }
         }
 
-        MutableBoolean checked = new MutableBoolean(check_box_state);
-        if (do_check_box(buf, get_next_uiid(), 500, 500, checked))
+        if (do_check_box(buf, get_next_uiid(), 500, 500, check_box_state))
         {
             check_box_state = !check_box_state;
         }
