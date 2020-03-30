@@ -6,7 +6,7 @@ public class Bitmap {
 
     public final int width;
     public final int height;
-    private final byte[] m_components; // format: A B G R
+    public final byte[] m_components; // format: A B G R
 
     public Bitmap(int w, int h)
     {

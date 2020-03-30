@@ -39,8 +39,8 @@ public class Sokoban extends Game
 
         boxes.add(new Box(event_stack, 5, 5));
         boxes.add(new Box(event_stack, 12, 9));
-        boxes.add(new Box(event_stack, 15, 16));
-        boxes.add(new Box(event_stack, 3, 17));
+        boxes.add(new Box(event_stack, 5, 7));
+        boxes.add(new Box(event_stack, 3, 6));
 
         points.add(new Vector2i(1, 1));
         points.add(new Vector2i(1, 2));

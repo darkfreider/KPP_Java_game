@@ -27,6 +27,7 @@ public class ImmGuiDemo extends Game
 
     int bg_color = 0xff9966ff;
     boolean check_box_state = false;
+    int circle_radius = 50;
 
     public ImmGuiDemo(Bitmap buf)
     {
@@ -195,6 +196,11 @@ public class ImmGuiDemo extends Game
             }
         }
 
+        if (do_check_box(buf, get_next_uiid(), 500, 500, check_box_state))
+        {
+            check_box_state = !check_box_state;
+        }
+
         int[] colors = {
                 0xff9966ff,
                 0xff66ccff,
@@ -230,14 +236,44 @@ public class ImmGuiDemo extends Game
             }
         }
 
-        if (do_check_box(buf, get_next_uiid(), 500, 500, check_box_state))
+        MutableFloat radius = new MutableFloat((float)circle_radius / 100.0f);
+        if (do_slider(buf, get_next_uiid(), base_slider_x + (3 * (32 + slider_padding)), base_slider_y, radius))
         {
-            check_box_state = !check_box_state;
+            circle_radius = (int)(radius.val * 100.0f);
         }
 
+
         immgui_finish();
+
+        draw_filled_circle(buf, 500, 400, circle_radius, 0);
+
     }
 
+    // NOTE(max): this algorithm is a garbage, this is only for testing purposes
+    private void draw_filled_circle(Bitmap buf, int center_x, int center_y, int radius, int argb)
+    {
+        byte a = (byte)(argb >> 24);
+        byte r = (byte)(argb >> 16);
+        byte g = (byte)(argb >> 8);
+        byte b = (byte)(argb);
+
+        int x = center_x - radius;
+        int y = center_y - radius;
+
+        for (int yy = y; yy < y + 2 * radius; yy++)
+        {
+            for (int xx = x; xx < x + 2 *radius; xx++)
+            {
+                int aa = (xx - center_x) * (xx - center_x);
+                int bb = (yy - center_y) * (yy - center_y);
+                int cc = radius * radius;
+                if (aa + bb < cc)
+                {
+                    buf.set_pixel(xx, yy, a, r, g, b);
+                }
+            }
+        }
+    }
     private void draw_rectangle(Bitmap buf, int x, int y, int width, int height, int argb)
     {
         if (x < 0)
