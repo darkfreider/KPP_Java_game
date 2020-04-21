@@ -5,7 +5,7 @@ import java.awt.event.*;
 // NOTE(max): for now I'll stick with this input class
 // all the credits go to this article -> https://www.gamedev.net/articles/programming/general-and-gameplay-programming/java-games-keyboard-and-mouse-r2439/
 // turns out that the problem was tha MY code that handled keyboard input (those callbacks) were running in as different thread
-// so yeah, SYNCHRONIZATION is quite important
+// so yeah, remember kids SYNCHRONIZATION is quite important
 
 public class Input implements KeyListener, MouseListener, MouseMotionListener {
 
