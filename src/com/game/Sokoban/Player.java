@@ -18,23 +18,23 @@ public class Player
         this.y = y;
     }
 
-    public boolean move_if_can(int[] static_map, int sm_width, int sm_height, Vector<Box> boxes, int dir_x, int dir_y)
+    public boolean move_if_can(GameLevel level, int dir_x, int dir_y)
     {
         boolean result = true;
 
         int new_x = x + dir_x;
         int new_y = y + dir_y;
 
-        if (static_map[new_y * sm_width + new_x] == 1)
+        if (level.static_map[new_y * level.map_width + new_x] == 1)
         {
             return (false);
         }
 
-        for (int i = 0; i < boxes.size(); i++)
+        for (int i = 0; i < level.boxes.size(); i++)
         {
-            if (boxes.get(i).x == new_x && boxes.get(i).y == new_y)
+            if (level.boxes.get(i).x == new_x && level.boxes.get(i).y == new_y)
             {
-                result = boxes.get(i).move_if_can(static_map, sm_width, sm_height, boxes, dir_x, dir_y);
+                result = level.boxes.get(i).move_if_can(level, dir_x, dir_y);
                 break;
             }
         }

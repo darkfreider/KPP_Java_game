@@ -19,54 +19,52 @@ public class Sokoban extends Game
     // NOTE(max): I's probably better to create an enum for this but who really cares?
     // I's for debugging purposes right now
     // 0 - normal mode, 1 - edit mode
-    private int game_mode = 0;
-    private int editor_mode = 1;
+    private int m_game_mode = 0;
+    private int m_editor_mode = 1;
 
     private int m_tile_width;
     private int m_tile_height;
 
     Stack<GameEvent> event_stack = new Stack<GameEvent>();
 
-    private int m_map_width;
-    private int m_map_height;
-    private int[] m_static_map;
-
-    Vector<Box> boxes = new Vector<Box>();
-    Player player = new Player(event_stack, 10, 10);
+    Vector<GameLevel> m_levels = new Vector<GameLevel>();
+    int m_current_level = 0;
 
     public Sokoban(Bitmap buf)
     {
         m_tile_width = m_tile_height = 32;
-        m_map_width = buf.width / 32;
-        m_map_height = buf.height / 32;
-        m_static_map = new int[m_map_width * m_map_height];
+        int map_width = buf.width / m_tile_width;
+        int map_height = buf.height / m_tile_height;
+        m_levels.add(new GameLevel(event_stack, 10, 10, map_width, map_height));
 
-        boxes.add(new Box(event_stack, 5, 5));
-        boxes.add(new Box(event_stack, 12, 9));
-        boxes.add(new Box(event_stack, 5, 7));
-        boxes.add(new Box(event_stack, 3, 6));
+        GameLevel test_level = m_levels.elementAt(m_current_level);
 
-        m_static_map[1 * m_map_width + 1] = 2;
-        m_static_map[2 * m_map_width + 1] = 2;
-        m_static_map[1 * m_map_width + 2] = 2;
-        m_static_map[9 * m_map_width + 7] = 2;
+        test_level.boxes.add(new Box(event_stack, 5, 5));
+        test_level.boxes.add(new Box(event_stack, 12, 9));
+        test_level.boxes.add(new Box(event_stack, 5, 7));
+        test_level.boxes.add(new Box(event_stack, 3, 6));
 
-        for (int y = 0; y < m_map_height; y++)
+        test_level.static_map[1 * map_width + 1] = 2;
+        test_level.static_map[2 * map_width + 1] = 2;
+        test_level.static_map[1 * map_width + 2] = 2;
+        test_level.static_map[9 * map_width + 7] = 2;
+
+        for (int y = 0; y < map_height; y++)
         {
-            for (int x = 0; x < m_map_width; x++)
+            for (int x = 0; x < map_width; x++)
             {
-                if ((x == 0 || x == m_map_width - 1) || (y == 0 || y == m_map_height - 1))
+                if ((x == 0 || x == map_width - 1) || (y == 0 || y == map_height - 1))
                 {
-                    m_static_map[y * m_map_width + x] = 1;
+                    test_level.static_map[y * map_width + x] = 1;
                 }
             }
         }
-        m_static_map[8 * m_map_width + 6] = 1;
-        m_static_map[8 * m_map_width + 7] = 1;
-        m_static_map[8 * m_map_width + 8] = 1;
+        test_level.static_map[8 * map_width + 6] = 1;
+        test_level.static_map[8 * map_width + 7] = 1;
+        test_level.static_map[8 * map_width + 8] = 1;
 
-        m_static_map[9 * m_map_width + 6] = 1;
-        m_static_map[9 * m_map_width + 8] = 1;
+        test_level.static_map[9 * map_width + 6] = 1;
+        test_level.static_map[9 * map_width + 8] = 1;
 
 
     }
@@ -76,15 +74,17 @@ public class Sokoban extends Game
     {
         if (input.key_down_once(KeyEvent.VK_F1))
         {
-            game_mode = (game_mode == 0) ? 1 : 0;
+            m_game_mode = (m_game_mode == 0) ? 1 : 0;
         }
 
-        if (game_mode == 0)
+        if (m_game_mode == 0)
         {
+            GameLevel level = m_levels.elementAt(m_current_level);
+
             if (input.key_down_once(KeyEvent.VK_RIGHT))
             {
                 event_stack.push(new GameEvent(GAME_EVENT_DELIMINATOR));
-                if (!player.move_if_can(m_static_map, m_map_width, m_map_height, boxes, 1, 0))
+                if (!level.player.move_if_can(m_levels.elementAt(m_current_level), 1, 0))
                 {
                     event_stack.pop();
                 }
@@ -92,7 +92,7 @@ public class Sokoban extends Game
             else if (input.key_down_once(KeyEvent.VK_LEFT))
             {
                 event_stack.push(new GameEvent(GAME_EVENT_DELIMINATOR));
-                if (!player.move_if_can(m_static_map, m_map_width, m_map_height, boxes, -1, 0))
+                if (!level.player.move_if_can(m_levels.elementAt(m_current_level), -1, 0))
                 {
                     event_stack.pop();
                 };
@@ -100,7 +100,7 @@ public class Sokoban extends Game
             else if (input.key_down_once(KeyEvent.VK_DOWN))
             {
                 event_stack.push(new GameEvent(GAME_EVENT_DELIMINATOR));
-                if (!player.move_if_can(m_static_map, m_map_width, m_map_height,  boxes, 0, 1))
+                if (!level.player.move_if_can(m_levels.elementAt(m_current_level), 0, 1))
                 {
                     event_stack.pop();
                 }
@@ -108,7 +108,7 @@ public class Sokoban extends Game
             else if (input.key_down_once(KeyEvent.VK_UP))
             {
                 event_stack.push(new GameEvent(GAME_EVENT_DELIMINATOR));
-                if (!player.move_if_can(m_static_map, m_map_width, m_map_height, boxes, 0, -1))
+                if (!level.player.move_if_can(m_levels.elementAt(m_current_level),0, -1))
                 {
                     event_stack.pop();
                 }
@@ -125,22 +125,26 @@ public class Sokoban extends Game
                             case GAME_EVENT_PLAYER_MOVE:
                             {
                                 GameEventPlayerMove e = (GameEventPlayerMove)unknown_event;
-                                player.x = e.old_x;
-                                player.y = e.old_y;
+                                level.player.x = e.old_x;
+                                level.player.y = e.old_y;
                             } break;
 
                             case GAME_EVENT_BOX_MOVE:
                             {
                                 GameEventBoxMove e = (GameEventBoxMove)unknown_event;
-                                int i = boxes.indexOf(e.box);
+                                int i = level.boxes.indexOf(e.box);
                                 if (i != (-1))
                                 {
-                                    boxes.get(i).x = e.old_x;
-                                    boxes.get(i).y = e.old_y;
+                                    level.boxes.get(i).x = e.old_x;
+                                    level.boxes.get(i).y = e.old_y;
                                 }
                                 else
                                 {
-                                    System.out.println("NOT GOOD");
+                                    // IMPORTANT(max): This clause means that a box was deleted but references to it are
+                                    //            still on the event stack.
+                                    //            I ASSUME that the game will never have a mechanic to delete boxes
+                                    //            so that when I undo changes the box should be restored.
+                                    //            A ASSUME that a deletion of a box will occur ONLY in game editor.
                                 }
                             } break;
 
@@ -157,18 +161,7 @@ public class Sokoban extends Game
         else
         {
             // NOTE(max): editor mode
-
-            // IMPORTANT(max): The things that you do in an editor can have some bad side effects
-            //                 if an event stack in not empty.
-            //                 Most problems will occur (I guess) in box removal code, because
-            //                 GameEventBoxMove assumes that the box is ALWAYS present in the game
-            //                 and never removed.
-            //                 Say you added a box, then you move it in a different place
-            //                 and then delete the box. Event stack now has a reference to a DELETED object
-            //                 and this is BAD.
-            //                 So the way to go is to edit a level (with event stack empty) and then play a level
-            //                 DO NOT intermix level editing and playing a level.
-
+            GameLevel level = m_levels.elementAt(m_current_level);
 
             int mx = input.mouse_x / m_tile_width;
             int my = input.mouse_y / m_tile_height;
@@ -176,30 +169,30 @@ public class Sokoban extends Game
             if (input.key_down_once(KeyEvent.VK_1))
             {
                 // NOTE(max): wall placement mode
-                editor_mode = 1;
+                m_editor_mode = 1;
             }
             else if (input.key_down_once(KeyEvent.VK_2))
             {
                 // NOTE(max): boxes placement mode
-                editor_mode = 2;
+                m_editor_mode = 2;
             }
             else if (input.key_down_once((KeyEvent.VK_3)))
             {
                 // NOTE(max): win slots(points) placement mode
-                editor_mode = 3;
+                m_editor_mode = 3;
             }
 
-            switch (editor_mode)
+            switch (m_editor_mode)
             {
                 case 1:
                 {
                     if (input.mbutton_down_once(1))
                     {
-                        m_static_map[my * m_map_width + mx] = 1;
+                        level.static_map[my * level.map_width + mx] = 1;
                     }
                     else if (input.mbutton_down_once(3))
                     {
-                        m_static_map[my * m_map_width + mx] = 0;
+                        level.static_map[my * level.map_width + mx] = 0;
                     }
                 } break;
 
@@ -207,11 +200,25 @@ public class Sokoban extends Game
                 {
                     if (input.mbutton_down_once(1))
                     {
-                       boxes.add(new Box(event_stack, mx, my));
+                        level.boxes.add(new Box(event_stack, mx, my));
                     }
                     else if (input.mbutton_down_once(3))
                     {
-                        // TODO(max): box removal
+                        for (Box box : level.boxes)
+                        {
+                            if (box.x == mx && box.y == my)
+                            {
+                                // TODO(max): I think that instead of using a vector I need to use linked list
+                                //            because deletion of elements from vectors is not great and it shifts items internally.
+                                //            But this is an editor code so maybe it's ok.
+                                if (!level.boxes.removeElement(box))
+                                {
+                                    // NOTE(max): I suppose this is impossible to reach this statement
+                                    System.out.println("BAD vector element removal");
+                                }
+                                break;
+                            }
+                        }
                     }
                 } break;
 
@@ -219,13 +226,13 @@ public class Sokoban extends Game
                 {
                     if (input.mbutton_down_once(1))
                     {
-                        m_static_map[my * m_map_width + mx] = 2;
+                        level.static_map[my * level.map_width + mx] = 2;
                     }
                     else if (input.mbutton_down_once(3))
                     {
                         // TODO(max): i actually just clears a cell value, even if i contains a wall
                         //            so I could probably make it more robust and check for this case
-                        m_static_map[my * m_map_width + mx] = 0;
+                        level.static_map[my * level.map_width + mx] = 0;
                     }
                 } break;
 
@@ -236,10 +243,10 @@ public class Sokoban extends Game
             }
         }
 
-        int counter = boxes.size();
-        for (Box box : boxes)
+        int counter = m_levels.elementAt(m_current_level).boxes.size();
+        for (Box box : m_levels.elementAt(m_current_level).boxes)
         {
-            if (m_static_map[box.y * m_map_width + box.x] == 2)
+            if (m_levels.elementAt(m_current_level).static_map[box.y * m_levels.elementAt(m_current_level).map_width + box.x] == 2)
             {
                 counter--;
             }
@@ -247,13 +254,15 @@ public class Sokoban extends Game
 
         if (counter != 0)
         {
+            GameLevel level = m_levels.elementAt(m_current_level);
+
             buf.clear((byte)0, (byte)0, (byte)0xff, (byte)0);
 
-            for (int y = 0; y < m_map_height; y++)
+            for (int y = 0; y < m_levels.elementAt(m_current_level).map_height; y++)
             {
-                for (int x = 0; x < m_map_width; x++)
+                for (int x = 0; x < m_levels.elementAt(m_current_level).map_width; x++)
                 {
-                    int cell_val = m_static_map[y * m_map_width + x];
+                    int cell_val = m_levels.elementAt(m_current_level).static_map[y * m_levels.elementAt(m_current_level).map_width + x];
                     if (cell_val == 1)
                     {
                         draw_rectangle(buf, x * m_tile_width, y * m_tile_height, m_tile_width, m_tile_height, 0, 0,0);
@@ -265,8 +274,8 @@ public class Sokoban extends Game
                 }
             }
 
-            draw_rectangle(buf, player.x * m_tile_width, player.y * m_tile_height, m_tile_width, m_tile_height, 0xff, 0, 0);
-            for (Box box : boxes)
+            draw_rectangle(buf, level.player.x * m_tile_width, level.player.y * m_tile_height, m_tile_width, m_tile_height, 0xff, 0, 0);
+            for (Box box : level.boxes)
             {
                 draw_rectangle(buf, box.x * m_tile_width, box.y * m_tile_height, m_tile_width, m_tile_height, 0xff, 0xff, 0);
             }
