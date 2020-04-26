@@ -19,6 +19,7 @@ public class Sokoban extends Game
     // NOTE(max): I's probably better to create an enum for this but who really cares?
     // I's for debugging purposes right now
     // 0 - normal mode, 1 - edit mode
+
     private int m_game_mode = 0;
     private int m_editor_mode = 1;
 
@@ -84,7 +85,7 @@ public class Sokoban extends Game
             if (input.key_down_once(KeyEvent.VK_RIGHT))
             {
                 event_stack.push(new GameEvent(GAME_EVENT_DELIMINATOR));
-                if (!level.player.move_if_can(m_levels.elementAt(m_current_level), 1, 0))
+                if (!level.player.move_if_can(level, 1, 0))
                 {
                     event_stack.pop();
                 }
@@ -92,7 +93,7 @@ public class Sokoban extends Game
             else if (input.key_down_once(KeyEvent.VK_LEFT))
             {
                 event_stack.push(new GameEvent(GAME_EVENT_DELIMINATOR));
-                if (!level.player.move_if_can(m_levels.elementAt(m_current_level), -1, 0))
+                if (!level.player.move_if_can(level, -1, 0))
                 {
                     event_stack.pop();
                 };
@@ -100,7 +101,7 @@ public class Sokoban extends Game
             else if (input.key_down_once(KeyEvent.VK_DOWN))
             {
                 event_stack.push(new GameEvent(GAME_EVENT_DELIMINATOR));
-                if (!level.player.move_if_can(m_levels.elementAt(m_current_level), 0, 1))
+                if (!level.player.move_if_can(level, 0, 1))
                 {
                     event_stack.pop();
                 }
@@ -108,7 +109,7 @@ public class Sokoban extends Game
             else if (input.key_down_once(KeyEvent.VK_UP))
             {
                 event_stack.push(new GameEvent(GAME_EVENT_DELIMINATOR));
-                if (!level.player.move_if_can(m_levels.elementAt(m_current_level),0, -1))
+                if (!level.player.move_if_can(level,0, -1))
                 {
                     event_stack.pop();
                 }
