@@ -48,8 +48,8 @@ public class StarField extends Game
             float hw = (float)buf.width / 2.0f;
             float hh = (float)buf.height / 2.0f;
 
-            int x = (int)((position_x[i] / position_z[i]) * hw + hw);
-            int y = (int)((position_y[i] / position_z[i]) * hh + hh);
+            int x = (int)((position_x[i] / -position_z[i]) * hw + hw);
+            int y = (int)((position_y[i] / -position_z[i]) * hh + hh);
             buf.set_pixel(x, y, (byte)0, (byte)0xff, (byte)0xff, (byte)0xff);
         }
     }

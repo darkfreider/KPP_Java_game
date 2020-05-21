@@ -18,10 +18,9 @@ public class Sokoban extends Game
 {
     // NOTE(max): I's probably better to create an enum for this but who really cares?
     // I's for debugging purposes right now
-    // 0 - normal mode, 1 - edit mode
+    // 0 - game menu,  1 - game
 
     private int m_game_mode = 0;
-    private int m_editor_mode = 1;
 
     private int m_tile_width;
     private int m_tile_height;
@@ -31,6 +30,9 @@ public class Sokoban extends Game
     Vector<GameLevel> m_levels = new Vector<GameLevel>();
     int m_current_level = 0;
 
+    GameUI ui = new GameUI();
+    GameUIState ui_state = new GameUIState();
+
     public Sokoban(Bitmap buf)
     {
         m_tile_width = m_tile_height = 32;
@@ -38,6 +40,8 @@ public class Sokoban extends Game
         int map_height = buf.height / m_tile_height;
         m_levels.add(new GameLevel(event_stack, 10, 10, map_width, map_height));
 
+        System.out.println(map_width);
+        System.out.println();
         GameLevel test_level = m_levels.elementAt(m_current_level);
 
         test_level.boxes.add(new Box(event_stack, 5, 5));
@@ -73,15 +77,52 @@ public class Sokoban extends Game
     @Override
     public void update_and_render(Bitmap buf, Input input, float dt)
     {
-        if (input.key_down_once(KeyEvent.VK_F1))
-        {
-            m_game_mode = (m_game_mode == 0) ? 1 : 0;
-        }
-
         if (m_game_mode == 0)
         {
-            GameLevel level = m_levels.elementAt(m_current_level);
+            buf.clear(ui_state.bg_color);
 
+            ui.prepare(input);
+
+            int[] colors = {
+                    0xff9966ff,
+                    0xff66ccff,
+                    0xffffff66,
+                    0xff00cc66,
+                    0xffff3300,
+                    0xff66ffcc,
+            };
+
+            int base_uiid = ui.get_next_uiid();
+            for (int i = 0; i < colors.length; i++)
+            {
+                int uiid = base_uiid + i;
+                int y = i / (colors.length / 2);
+                int x = i - y * (colors.length / 2);
+
+                int box_x = ui_state.reference_x + (x  * ui.button_width) + (x * 50);
+                int box_y = ui_state.reference_y + y * (ui.button_height + 20);
+                if (ui.do_button(buf, uiid, box_x, box_y))
+                {
+                    if (uiid == (base_uiid + 1))
+                    {
+                        m_game_mode = 1;
+                    }
+                    ui_state.bg_color = colors[i];
+                }
+            }
+
+            ui.finish();
+        }
+        else
+        {
+            // NOTE(max): game_mode = game
+
+            if (input.key_down_once(KeyEvent.VK_ESCAPE))
+            {
+                m_game_mode = 0;
+            }
+
+            GameLevel level = m_levels.elementAt(m_current_level);
             if (input.key_down_once(KeyEvent.VK_RIGHT))
             {
                 event_stack.push(new GameEvent(GAME_EVENT_DELIMINATOR));
@@ -158,143 +199,79 @@ public class Sokoban extends Game
                     event_stack.pop();
                 }
             }
-        }
-        else
-        {
-            // NOTE(max): editor mode
-            GameLevel level = m_levels.elementAt(m_current_level);
 
-            int mx = input.mouse_x / m_tile_width;
-            int my = input.mouse_y / m_tile_height;
-
-            if (input.key_down_once(KeyEvent.VK_1))
+            // NOTE(max): game_code = game, render the game
+            int counter = m_levels.elementAt(m_current_level).boxes.size();
+            for (Box box : m_levels.elementAt(m_current_level).boxes)
             {
-                // NOTE(max): wall placement mode
-                m_editor_mode = 1;
-            }
-            else if (input.key_down_once(KeyEvent.VK_2))
-            {
-                // NOTE(max): boxes placement mode
-                m_editor_mode = 2;
-            }
-            else if (input.key_down_once((KeyEvent.VK_3)))
-            {
-                // NOTE(max): win slots(points) placement mode
-                m_editor_mode = 3;
-            }
-
-            switch (m_editor_mode)
-            {
-                case 1:
+                if (m_levels.elementAt(m_current_level).static_map[box.y * m_levels.elementAt(m_current_level).map_width + box.x] == 2)
                 {
-                    if (input.mbutton_down_once(1))
-                    {
-                        level.static_map[my * level.map_width + mx] = 1;
-                    }
-                    else if (input.mbutton_down_once(3))
-                    {
-                        level.static_map[my * level.map_width + mx] = 0;
-                    }
-                } break;
-
-                case 2:
-                {
-                    if (input.mbutton_down_once(1))
-                    {
-                        level.boxes.add(new Box(event_stack, mx, my));
-                    }
-                    else if (input.mbutton_down_once(3))
-                    {
-                        for (Box box : level.boxes)
-                        {
-                            if (box.x == mx && box.y == my)
-                            {
-                                // TODO(max): I think that instead of using a vector I need to use linked list
-                                //            because deletion of elements from vectors is not great and it shifts items internally.
-                                //            But this is an editor code so maybe it's ok.
-                                if (!level.boxes.removeElement(box))
-                                {
-                                    // NOTE(max): I suppose this is impossible to reach this statement
-                                    System.out.println("BAD vector element removal");
-                                }
-                                break;
-                            }
-                        }
-                    }
-                } break;
-
-                case 3:
-                {
-                    if (input.mbutton_down_once(1))
-                    {
-                        level.static_map[my * level.map_width + mx] = 2;
-                    }
-                    else if (input.mbutton_down_once(3))
-                    {
-                        // TODO(max): i actually just clears a cell value, even if i contains a wall
-                        //            so I could probably make it more robust and check for this case
-                        level.static_map[my * level.map_width + mx] = 0;
-                    }
-                } break;
-
-                default:
-                {
-                    System.out.println("Undefined editor mode");
-                } break;
-            }
-        }
-
-        int counter = m_levels.elementAt(m_current_level).boxes.size();
-        for (Box box : m_levels.elementAt(m_current_level).boxes)
-        {
-            if (m_levels.elementAt(m_current_level).static_map[box.y * m_levels.elementAt(m_current_level).map_width + box.x] == 2)
-            {
-                counter--;
-            }
-        }
-
-        if (counter != 0)
-        {
-            GameLevel level = m_levels.elementAt(m_current_level);
-
-            buf.clear((byte)0, (byte)0, (byte)0xff, (byte)0);
-
-            for (int y = 0; y < m_levels.elementAt(m_current_level).map_height; y++)
-            {
-                for (int x = 0; x < m_levels.elementAt(m_current_level).map_width; x++)
-                {
-                    int cell_val = m_levels.elementAt(m_current_level).static_map[y * m_levels.elementAt(m_current_level).map_width + x];
-                    if (cell_val == 1)
-                    {
-                        draw_rectangle(buf, x * m_tile_width, y * m_tile_height, m_tile_width, m_tile_height, 0, 0,0);
-                    }
-                    else if (cell_val == 2)
-                    {
-                        draw_rectangle(buf, x * m_tile_width, y * m_tile_height, m_tile_width, m_tile_height, 0xff, 0xff, 0xff);
-                    }
+                    counter--;
                 }
             }
 
-            draw_rectangle(buf, level.player.x * m_tile_width, level.player.y * m_tile_height, m_tile_width, m_tile_height, 0xff, 0, 0);
-            for (Box box : level.boxes)
+            if (counter != 0)
             {
-                draw_rectangle(buf, box.x * m_tile_width, box.y * m_tile_height, m_tile_width, m_tile_height, 0xff, 0xff, 0);
+                buf.clear((byte)0, (byte)0, (byte)0xff, (byte)0);
+
+                for (int y = 0; y < m_levels.elementAt(m_current_level).map_height; y++)
+                {
+                    for (int x = 0; x < m_levels.elementAt(m_current_level).map_width; x++)
+                    {
+                        int cell_val = m_levels.elementAt(m_current_level).static_map[y * m_levels.elementAt(m_current_level).map_width + x];
+                        if (cell_val == 1)
+                        {
+                            draw_rectangle(buf, x * m_tile_width, y * m_tile_height, m_tile_width, m_tile_height, 0, 0,0);
+                        }
+                        else if (cell_val == 2)
+                        {
+                            draw_rectangle(buf, x * m_tile_width, y * m_tile_height, m_tile_width, m_tile_height, 0xff, 0xff, 0xff);
+                        }
+                    }
+                }
+
+                draw_rectangle(buf, level.player.x * m_tile_width, level.player.y * m_tile_height, m_tile_width, m_tile_height, 0xff, 0, 0);
+                for (Box box : level.boxes)
+                {
+                    draw_rectangle(buf, box.x * m_tile_width, box.y * m_tile_height, m_tile_width, m_tile_height, 0xff, 0xff, 0);
+                }
+            }
+            else
+            {
+                buf.clear((byte)0, (byte)0xff, (byte)0xff, (byte)0xff);
+
             }
         }
-        else
-        {
-            buf.clear((byte)0, (byte)0xff, (byte)0xff, (byte)0xff);
 
-        }
+
     }
 
     private void draw_rectangle(Bitmap buf, int x, int y, int width, int height, int r, int g, int b)
     {
+        if (x < 0)
+        {
+            width += x;
+            x = 0;
+        }
+        if ((x + width) >= buf.width)
+        {
+            width = buf.width - x;
+        }
+        if (y < 0)
+        {
+            height += y;
+            y = 0;
+        }
+        if ((y + height) >= buf.height)
+        {
+            height = buf.height - y;
+        }
+
         for (int yy = y; yy < y + height; yy++)
         {
             for (int xx = x; xx < x + width; xx++)
             {
-                buf.set_pixel(xx, yy, (byte)0, (byte)r, (byte)g, (byte)b);
+                buf.set_pixel(xx, yy, (byte) 0, (byte)r, (byte)g, (byte)b);
             }
         }
     }
