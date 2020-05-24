@@ -6,6 +6,7 @@ import com.game.PlatformServices.Input;
 import com.game.Vector2i;
 
 import java.awt.event.KeyEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -25,22 +26,32 @@ public class Sokoban extends Game
     private int m_tile_width;
     private int m_tile_height;
 
+    private int map_width;
+    private int map_height;
+
     Stack<GameEvent> event_stack = new Stack<GameEvent>();
 
-    Vector<GameLevel> m_levels = new Vector<GameLevel>();
-    int m_current_level = 0;
+    GameLevel m_current_level = null;
 
     GameUI ui = new GameUI();
     GameUIState ui_state = new GameUIState();
 
-    public Sokoban(Bitmap buf)
-    {
-        m_tile_width = m_tile_height = 32;
-        int map_width = buf.width / m_tile_width;
-        int map_height = buf.height / m_tile_height;
-        m_levels.add(new GameLevel(event_stack, 10, 10, map_width, map_height));
+    String base_path = "E:\\University\\Java_programming\\JavaGame\\src\\com\\game\\Sokoban\\";
 
-        System.out.println(map_width);
+    public Sokoban(Bitmap buf) throws IOException {
+        m_tile_width = m_tile_height = 32;
+        map_width = buf.width / m_tile_width;
+        map_height = buf.height / m_tile_height;
+
+        /*
+        for (int i = 0; i < 6; i++)
+            m_levels.add(new GameLevel(event_stack, 10, 10, map_width, map_height));
+
+        for (int i = 0; i < 6; i++)
+            m_levels.elementAt(i).load_level(base_path + "level" + i " ".txt");
+
+        */
+        /*System.out.println(map_width);
         System.out.println();
         GameLevel test_level = m_levels.elementAt(m_current_level);
 
@@ -69,7 +80,7 @@ public class Sokoban extends Game
         test_level.static_map[8 * map_width + 8] = 1;
 
         test_level.static_map[9 * map_width + 6] = 1;
-        test_level.static_map[9 * map_width + 8] = 1;
+        test_level.static_map[9 * map_width + 8] = 1;*/
 
 
     }
@@ -103,9 +114,15 @@ public class Sokoban extends Game
                 int box_y = ui_state.reference_y + y * (ui.button_height + 20);
                 if (ui.do_button(buf, uiid, box_x, box_y))
                 {
-                    if (uiid == (base_uiid + 1))
+                    if (uiid == (base_uiid + 0))
                     {
                         m_game_mode = 1;
+                        try {
+                            event_stack.clear();
+                            m_current_level = new GameLevel(event_stack, base_path + "level0.txt", map_width, map_height);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                     ui_state.bg_color = colors[i];
                 }
@@ -122,7 +139,7 @@ public class Sokoban extends Game
                 m_game_mode = 0;
             }
 
-            GameLevel level = m_levels.elementAt(m_current_level);
+            GameLevel level = m_current_level;
             if (input.key_down_once(KeyEvent.VK_RIGHT))
             {
                 event_stack.push(new GameEvent(GAME_EVENT_DELIMINATOR));
@@ -200,11 +217,11 @@ public class Sokoban extends Game
                 }
             }
 
-            // NOTE(max): game_code = game, render the game
-            int counter = m_levels.elementAt(m_current_level).boxes.size();
-            for (Box box : m_levels.elementAt(m_current_level).boxes)
+            // NOTE(max): game_mode = game, render the game
+            int counter = m_current_level.boxes.size();
+            for (Box box : m_current_level.boxes)
             {
-                if (m_levels.elementAt(m_current_level).static_map[box.y * m_levels.elementAt(m_current_level).map_width + box.x] == 2)
+                if (m_current_level.static_map[box.y * m_current_level.map_width + box.x] == 2)
                 {
                     counter--;
                 }
@@ -214,11 +231,11 @@ public class Sokoban extends Game
             {
                 buf.clear((byte)0, (byte)0, (byte)0xff, (byte)0);
 
-                for (int y = 0; y < m_levels.elementAt(m_current_level).map_height; y++)
+                for (int y = 0; y < m_current_level.map_height; y++)
                 {
-                    for (int x = 0; x < m_levels.elementAt(m_current_level).map_width; x++)
+                    for (int x = 0; x < m_current_level.map_width; x++)
                     {
-                        int cell_val = m_levels.elementAt(m_current_level).static_map[y * m_levels.elementAt(m_current_level).map_width + x];
+                        int cell_val = m_current_level.static_map[y * m_current_level.map_width + x];
                         if (cell_val == 1)
                         {
                             draw_rectangle(buf, x * m_tile_width, y * m_tile_height, m_tile_width, m_tile_height, 0, 0,0);
@@ -238,8 +255,8 @@ public class Sokoban extends Game
             }
             else
             {
-                buf.clear((byte)0, (byte)0xff, (byte)0xff, (byte)0xff);
-
+                //buf.clear((byte)0, (byte)0xff, (byte)0xff, (byte)0xff);
+                m_game_mode = 0;
             }
         }
 

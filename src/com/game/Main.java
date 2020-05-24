@@ -6,6 +6,8 @@ import com.game.Sokoban.Sokoban;
 import com.game.PlatformServices.Display;
 import com.game.PlatformServices.Input;
 
+import java.io.IOException;
+
 public class Main {
 
     private final float frame_time = 1.0f / 30.0f;
@@ -18,7 +20,12 @@ public class Main {
         Display d = new Display(dwidth, dheight, "Java window!");
         Input input = new Input(d);
 
-        Game game = new Sokoban(d.get_frame_buffer());
+        Game game = null;
+        try {
+            game = new Sokoban(d.get_frame_buffer());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         long last_time = System.nanoTime();
         while (is_running) {
