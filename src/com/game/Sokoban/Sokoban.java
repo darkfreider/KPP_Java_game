@@ -7,6 +7,8 @@ import com.game.Vector2i;
 
 import java.awt.event.KeyEvent;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -36,53 +38,12 @@ public class Sokoban extends Game
     GameUI ui = new GameUI();
     GameUIState ui_state = new GameUIState();
 
-    String base_path = "E:\\University\\Java_programming\\JavaGame\\src\\com\\game\\Sokoban\\";
-
-    public Sokoban(Bitmap buf) throws IOException {
+    //String base_path = "E:\\University\\Java_programming\\JavaGame\\src\\com\\game\\Sokoban\\";
+    String base_path = ".\\levels\\";
+    public Sokoban(Bitmap buf) {
         m_tile_width = m_tile_height = 32;
         map_width = buf.width / m_tile_width;
         map_height = buf.height / m_tile_height;
-
-        /*
-        for (int i = 0; i < 6; i++)
-            m_levels.add(new GameLevel(event_stack, 10, 10, map_width, map_height));
-
-        for (int i = 0; i < 6; i++)
-            m_levels.elementAt(i).load_level(base_path + "level" + i " ".txt");
-
-        */
-        /*System.out.println(map_width);
-        System.out.println();
-        GameLevel test_level = m_levels.elementAt(m_current_level);
-
-        test_level.boxes.add(new Box(event_stack, 5, 5));
-        test_level.boxes.add(new Box(event_stack, 12, 9));
-        test_level.boxes.add(new Box(event_stack, 5, 7));
-        test_level.boxes.add(new Box(event_stack, 3, 6));
-
-        test_level.static_map[1 * map_width + 1] = 2;
-        test_level.static_map[2 * map_width + 1] = 2;
-        test_level.static_map[1 * map_width + 2] = 2;
-        test_level.static_map[9 * map_width + 7] = 2;
-
-        for (int y = 0; y < map_height; y++)
-        {
-            for (int x = 0; x < map_width; x++)
-            {
-                if ((x == 0 || x == map_width - 1) || (y == 0 || y == map_height - 1))
-                {
-                    test_level.static_map[y * map_width + x] = 1;
-                }
-            }
-        }
-        test_level.static_map[8 * map_width + 6] = 1;
-        test_level.static_map[8 * map_width + 7] = 1;
-        test_level.static_map[8 * map_width + 8] = 1;
-
-        test_level.static_map[9 * map_width + 6] = 1;
-        test_level.static_map[9 * map_width + 8] = 1;*/
-
-
     }
 
     @Override
@@ -114,12 +75,12 @@ public class Sokoban extends Game
                 int box_y = ui_state.reference_y + y * (ui.button_height + 20);
                 if (ui.do_button(buf, uiid, box_x, box_y))
                 {
-                    if (uiid == (base_uiid + 0))
+                    if (uiid == (base_uiid + 0) || uiid == (base_uiid + 1))
                     {
                         m_game_mode = 1;
                         try {
                             event_stack.clear();
-                            m_current_level = new GameLevel(event_stack, base_path + "level0.txt", map_width, map_height);
+                            m_current_level = new GameLevel(event_stack, base_path + "level" + i + ".txt", map_width, map_height);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }

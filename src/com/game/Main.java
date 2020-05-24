@@ -20,12 +20,8 @@ public class Main {
         Display d = new Display(dwidth, dheight, "Java window!");
         Input input = new Input(d);
 
-        Game game = null;
-        try {
-            game = new Sokoban(d.get_frame_buffer());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Game game = new Sokoban(d.get_frame_buffer());
+
 
         long last_time = System.nanoTime();
         while (is_running) {
